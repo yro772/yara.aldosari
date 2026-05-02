@@ -1,20 +1,487 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="ar" dir="rtl">
 <head>
-  <title>حصادي</title>
-  <style>
-    body {
-      text-align: center;
-      font-family: Arial;
-      background-color: #f5f5f5;
-    }
-    h1 {
-      color: green;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>حصادي — منصة مزارع الأفلاج</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🌾 حصادي</h1>
-  <p>منتجات طازجة من المزرعة إلى بيتك</p>
+<canvas id="bgc"></canvas>
+<div id="toast" class="toast"></div>
+
+<div class="layout">
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-ico">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M16 3C9 3 4 8 4 15C4 22 9 28 16 31C23 28 28 22 28 15C28 8 23 3 16 3Z" stroke="#8fc93a" stroke-width="1.8"/><circle cx="16" cy="15" r="3" fill="#8fc93a"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">حصادي</div>
+      <div class="brand-sub">AL-AFLAJ FARMS</div>
+    </div>
+  </div>
+  <div class="nav-links" id="nav-links">
+    <a class="nav-a active" id="na-home"        onclick="go('home')">🏠 <span>الرئيسية</span></a>
+    <a class="nav-a"        id="na-products"    onclick="go('products')">📦 <span>المنتجات</span></a>
+    <a class="nav-a"        id="na-orders"      onclick="go('orders')">🧾 <span>الطلبات</span></a>
+    <a class="nav-a"        id="na-messages"    onclick="go('messages')">💬 <span>الرسائل</span></a>
+    <a class="nav-a"        id="na-guides"      onclick="go('guides')">📖 <span>الإرشادات</span></a>
+    <a class="nav-a hidden" id="na-farmer-dash" onclick="go('farmer-dash')">⚡ <span>لوحتي</span></a>
+    <a class="nav-a hidden" id="na-admin-dash"  onclick="go('admin-dash')">🛡️ <span>تحكم</span></a>
+    <a class="nav-a hidden" id="na-reports"     onclick="go('reports')">📊 <span>التقارير</span></a>
+    <a class="nav-a hidden" id="na-ads"         onclick="go('ads')">📢 <span>الإعلانات</span></a>
+    <div class="nav-sep"></div>
+    <a class="nav-a"        id="na-account"     onclick="go('account')">👤 <span>حسابي</span></a>
+    <a class="nav-a hidden" id="na-logout"      onclick="doLogout()" style="color:#f09070">🚪 <span>خروج</span></a>
+  </div>
+  <div class="sidebar-user hidden" id="sidebar-user">
+    <div class="su-av" id="su-av">م</div>
+    <div><div class="su-name" id="su-name">-</div><div class="su-role" id="su-role">-</div></div>
+  </div>
+</nav>
+
+<!-- ═══ CONTENT ═══ -->
+
+<main class="main" id="main">
+
+<!-- ص١: الرئيسية -->
+
+<div class="pg active" id="pg-home">
+  <div class="pg-top" id="home-top">
+    <div>
+      <h1>مرحباً في <span class="lime">حصادي</span></h1>
+      <p class="sub">منصة مزارع الأفلاج — منتجات طازجة مباشرة من المزرعة</p>
+    </div>
+    <div class="auth-btns" id="auth-btns">
+      <button class="btn-out" onclick="go('login')">دخول</button>
+      <button class="btn-pri" onclick="go('register')">إنشاء حساب</button>
+    </div>
+  </div>
+  <div class="pg-scroll">
+    <div id="home-ads"></div>
+    <div class="stats4" id="home-stats">
+      <div class="scard"><div class="sn">١٤٠+</div><div class="sl">مزرعة</div></div>
+      <div class="scard"><div class="sn">٨٠+</div><div class="sl">مزارع نشط</div></div>
+      <div class="scard"><div class="sn">١٢</div><div class="sl">نوع محصول</div></div>
+      <div class="scard"><div class="sn">٣٢٠+</div><div class="sl">طلب مكتمل</div></div>
+    </div>
+    <div class="sec-head"><h2>منتجات <span class="lime">مختارة</span></h2><a class="sec-a" onclick="go('products')">عرض الكل</a></div>
+    <div class="grid4" id="home-prods"></div>
+    <div class="sec-head" style="margin-top:24px"><h2>إرشادات <span class="lime">زراعية</span></h2><a class="sec-a" onclick="go('guides')">الكل</a></div>
+    <div class="grid2" id="home-guides"></div>
+  </div>
+</div>
+
+<!-- ص٢: تسجيل الدخول -->
+
+<div class="pg" id="pg-login">
+  <div class="pg-scroll center-pg">
+    <div class="auth-box">
+      <h2>مرحباً في حصادي 🌾</h2>
+      <p class="sub">سجّل الدخول للمتابعة</p>
+      <div class="field"><input type="email" id="l-em" placeholder="البريد الإلكتروني"></div>
+      <div class="field"><input type="password" id="l-pw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-pri full" onclick="doLogin()">تسجيل الدخول</button>
+      <div class="divider">أو</div>
+      <button class="btn-out full" onclick="go('register')">إنشاء حساب جديد</button>
+      <div class="hint">للتجربة: ahmed@test.com | farmer@test.com | admin@test.com<br>(أي كلمة مرور)</div>
+      <a class="back-a" onclick="go('home')">← رجوع للرئيسية</a>
+    </div>
+  </div>
+</div>
+
+<!-- ص٣: إنشاء حساب -->
+
+<div class="pg" id="pg-register">
+  <div class="pg-scroll center-pg">
+    <div class="auth-box wide">
+      <h2>إنشاء حساب جديد</h2>
+      <p class="sub">انضم لمجتمع مزارع الأفلاج</p>
+      <div class="role-row">
+        <button class="role-btn active" id="rb-client" onclick="selRole('client')"><span>🛒</span><span>عميل</span></button>
+        <button class="role-btn" id="rb-farmer" onclick="selRole('farmer')"><span>🌾</span><span>مزارع</span></button>
+        <button class="role-btn" id="rb-admin"  onclick="selRole('admin')"><span>🛡️</span><span>أدمن</span></button>
+      </div>
+      <div class="two-col">
+        <div class="field"><input type="text" id="r-fn" placeholder="الاسم الأول *"></div>
+        <div class="field"><input type="text" id="r-ln" placeholder="اسم العائلة"></div>
+      </div>
+      <div class="field"><input type="email" id="r-em" placeholder="البريد الإلكتروني *"></div>
+      <div class="field"><input type="tel"   id="r-ph" placeholder="رقم الجوال"></div>
+      <div class="field"><input type="password" id="r-pw" placeholder="كلمة المرور *"></div>
+      <button class="btn-pri full" onclick="doRegister()">إنشاء الحساب</button>
+      <div class="divider">لديك حساب؟</div>
+      <button class="btn-out full" onclick="go('login')">تسجيل الدخول</button>
+    </div>
+  </div>
+</div>
+
+<!-- ص٤: المنتجات -->
+
+<div class="pg" id="pg-products">
+  <div class="pg-top">
+    <h2>المنتجات</h2>
+    <button class="btn-pri hidden" id="add-prod-btn" onclick="openAddProduct(null)">+ إضافة منتج</button>
+  </div>
+  <div class="search-row">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.8" stroke-linecap="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="srch" placeholder="ابحث عن منتج أو مزرعة..." oninput="doFilter()">
+    </div>
+    <select id="f-cat" onchange="doFilter()" class="f-sel">
+      <option value="">كل الفئات</option>
+      <option>تمور</option><option>خضار</option><option>فواكه</option><option>عسل</option><option>أعشاب</option>
+    </select>
+    <select id="f-sort" onchange="doFilter()" class="f-sel">
+      <option value="">ترتيب افتراضي</option>
+      <option value="pa">أقل سعر</option>
+      <option value="pd">أعلى سعر</option>
+      <option value="pop">الأكثر شراءً</option>
+      <option value="rat">الأعلى تقييماً</option>
+    </select>
+  </div>
+  <div class="pg-scroll" style="padding-top:8px"><div id="prods-grid" class="prod-grid"></div></div>
+</div>
+
+<!-- ص٥: تفاصيل منتج -->
+
+<div class="pg" id="pg-detail">
+  <div class="pg-top"><button class="btn-back" onclick="go('products')">← المنتجات</button></div>
+  <div class="pg-scroll">
+    <div class="detail-wrap">
+      <div class="detail-left">
+        <div class="detail-img" id="d-img"></div>
+        <div class="detail-acts" id="d-acts"></div>
+      </div>
+      <div class="detail-right">
+        <div id="d-badges" class="badges-row"></div>
+        <h1 id="d-name" class="d-name"></h1>
+        <div id="d-farm" class="d-farm"></div>
+        <div id="d-rating"></div>
+        <div class="d-price-row">
+          <span id="d-price" class="d-price"></span>
+          <span id="d-stock" class="stock-badge"></span>
+        </div>
+        <p id="d-desc" class="d-desc"></p>
+        <div id="d-meta" class="meta-grid"></div>
+        <!-- التقييم -->
+        <div id="rating-sec" class="hidden">
+          <div class="divider-line"></div>
+          <h3 class="sec-sm">⭐ قيّم المنتج</h3>
+          <div class="stars-row" id="stars-in">
+            <span class="star" onclick="setStar(1)">★</span><span class="star" onclick="setStar(2)">★</span>
+            <span class="star" onclick="setStar(3)">★</span><span class="star" onclick="setStar(4)">★</span>
+            <span class="star" onclick="setStar(5)">★</span>
+            <span id="star-lbl" class="star-lbl">اختر تقييمك</span>
+          </div>
+          <textarea id="rv-txt" class="rv-input" placeholder="اكتب تعليقك (اختياري)..."></textarea>
+          <div class="rv-photo-row">
+            <label class="rv-photo-btn">
+              <input type="file" id="rv-photo" accept="image/*" onchange="previewRvPhoto(this)" style="display:none">
+              📷 أضف صورة للتقييم
+            </label>
+            <span id="rv-photo-name" class="rv-photo-name"></span>
+          </div>
+          <button class="btn-pri" onclick="submitReview()">إرسال التقييم</button>
+        </div>
+        <div class="divider-line"></div>
+        <h3 class="sec-sm">💬 التعليقات والتقييمات</h3>
+        <div id="reviews"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ص٦: الدفع -->
+
+<div class="pg" id="pg-checkout">
+  <div class="pg-top"><button class="btn-back" onclick="go('detail')">← رجوع</button><h2>إتمام الطلب</h2></div>
+  <div class="pg-scroll">
+    <div class="checkout-wrap">
+      <div class="co-left">
+        <div class="co-sec"><h3>📦 المنتج</h3><div id="co-prod"></div></div>
+        <div class="co-sec">
+          <h3>📍 عنوان الشحن</h3>
+          <div class="two-col">
+            <div class="field"><input type="text" id="sh-name" placeholder="اسم المستلم *"></div>
+            <div class="field"><input type="tel"  id="sh-phone" placeholder="رقم الجوال *"></div>
+          </div>
+          <div class="field">
+            <select id="sh-city">
+              <option value="">المدينة *</option>
+              <option>الرياض</option><option>جدة</option><option>الدمام</option>
+              <option>مكة المكرمة</option><option>المدينة المنورة</option>
+              <option>الأفلاج</option><option>السليل</option>
+            </select>
+          </div>
+          <div class="field"><input type="text" id="sh-addr" placeholder="الحي / الشارع *"></div>
+          <div class="field"><textarea id="sh-notes" placeholder="ملاحظات (اختياري)"></textarea></div>
+        </div>
+        <div class="co-sec">
+          <h3>🚚 التوصيل</h3>
+          <div class="del-opts">
+            <label class="del-opt active" id="do-std" onclick="setDel('standard')">
+              <input type="radio" name="del" checked>
+              <div><div class="del-name">📦 عادي — أرامكس</div><div class="del-sub">٣-٥ أيام</div></div>
+              <span class="del-fee">١٥ ر</span>
+            </label>
+            <label class="del-opt" id="do-exp" onclick="setDel('express')">
+              <input type="radio" name="del">
+              <div><div class="del-name">⚡ سريع — DHL</div><div class="del-sub">١-٢ يوم</div></div>
+              <span class="del-fee">٣٠ ر</span>
+            </label>
+            <label class="del-opt" id="do-pick" onclick="setDel('pickup')">
+              <input type="radio" name="del">
+              <div><div class="del-name">🏪 استلام من المزرعة</div><div class="del-sub">حسب الاتفاق</div></div>
+              <span class="del-fee lime">مجاني</span>
+            </label>
+          </div>
+        </div>
+        <div class="co-sec">
+          <h3>💳 الدفع</h3>
+          <div class="pay-btns">
+            <button class="pay-btn active" id="pb-card"   onclick="setPay('card')">💳 بطاقة</button>
+            <button class="pay-btn"        id="pb-mada"   onclick="setPay('mada')">🏧 مدى</button>
+            <button class="pay-btn"        id="pb-stc"    onclick="setPay('stc')">📱 STC Pay</button>
+            <button class="pay-btn"        id="pb-cod"    onclick="setPay('cod')">💵 عند الاستلام</button>
+          </div>
+          <div id="card-flds">
+            <div class="field card-wrap">
+              <input type="text" id="cc-num" placeholder="xxxx xxxx xxxx xxxx" maxlength="19" oninput="fmtCardNum(this)">
+              <span id="cc-brand">💳</span>
+            </div>
+            <div class="field"><input type="text" id="cc-name" placeholder="اسم حامل البطاقة"></div>
+            <div class="two-col">
+              <div class="field"><input type="text" id="cc-exp" placeholder="MM/YY" maxlength="5" oninput="fmtCardExp(this)"></div>
+              <div class="field"><input type="password" id="cc-cvv" placeholder="CVV" maxlength="4"></div>
+            </div>
+            <div class="ssl-badge">🔒 دفع آمن بتشفير SSL</div>
+          </div>
+          <div id="stc-fld" class="hidden"><div class="field"><input type="tel" id="stc-ph" placeholder="رقم جوال STC Pay"></div></div>
+          <div id="cod-note" class="hidden"><div class="info-note">💵 ستدفع نقداً عند الاستلام + ٥ ريال رسوم</div></div>
+        </div>
+      </div>
+      <div class="co-right">
+        <div class="price-box">
+          <h3>ملخص الطلب</h3>
+          <div id="price-rows"></div>
+          <button class="btn-pri full" id="confirm-btn" onclick="confirmOrder()" style="margin-top:16px">🔒 تأكيد الطلب والدفع</button>
+          <div class="secure-row"><span>🔒 آمن</span><span>✓ مضمون</span><span>↩ استرداد</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ص٧: نجاح الدفع -->
+
+<div class="pg" id="pg-success">
+  <div class="pg-scroll center-pg">
+    <div class="success-wrap">
+      <div class="success-ic">✓</div>
+      <h2>تم الطلب بنجاح! 🎉</h2>
+      <p>طلبك في طريقه إليك</p>
+      <div id="suc-num" class="suc-num"></div>
+      <div id="suc-detail"></div>
+      <div class="two-btns">
+        <button class="btn-pri" onclick="go('orders')">📦 طلباتي</button>
+        <button class="btn-out" onclick="go('products')">🛒 مواصلة التسوق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ص٨: الطلبات -->
+
+<div class="pg" id="pg-orders">
+  <div class="pg-top"><h2>سجل الطلبات</h2></div>
+  <div class="tab-row">
+    <button class="tab active" onclick="filterOrds(this,'all')">الكل</button>
+    <button class="tab" onclick="filterOrds(this,'pending')">⏳ قيد التنفيذ</button>
+    <button class="tab" onclick="filterOrds(this,'done')">✓ مكتملة</button>
+    <button class="tab" onclick="filterOrds(this,'cancel')">✕ ملغاة</button>
+  </div>
+  <div class="pg-scroll" style="padding-top:8px"><div id="ords-list" class="ords-wrap"></div></div>
+</div>
+
+<!-- ص٩: تفاصيل طلب -->
+
+<div class="pg" id="pg-order-detail">
+  <div class="pg-top">
+    <button class="btn-back" onclick="go('orders')">← الطلبات</button>
+    <button class="btn-out" id="print-btn">🖨️ طباعة الفاتورة</button>
+  </div>
+  <div class="pg-scroll"><div id="ord-detail" class="ord-detail-grid"></div></div>
+</div>
+
+<!-- ص١٠: الرسائل -->
+
+<div class="pg" id="pg-messages">
+  <div class="pg-top"><h2>الرسائل</h2></div>
+  <div class="pg-scroll"><div id="convs-wrap" class="convs-wrap"></div></div>
+</div>
+
+<!-- ص١١: المحادثة -->
+
+<div class="pg chat-pg" id="pg-chat">
+  <div class="chat-top">
+    <button class="btn-back" onclick="go('messages')">←</button>
+    <div class="chat-av" id="chat-av">م</div>
+    <div><div class="chat-nm" id="chat-nm">-</div><div class="chat-on">متصل الآن</div></div>
+  </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="chat-input" id="chat-input">
+    <textarea id="msg-txt" placeholder="اكتب رسالة..." oninput="autoH(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+    <button class="send-btn" onclick="sendMsg()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ص١٢: الإرشادات -->
+
+<div class="pg" id="pg-guides">
+  <div class="pg-top">
+    <h2>الإرشادات الزراعية</h2>
+    <button class="btn-pri hidden" id="add-guide-btn" onclick="showM('m-guide')">+ إرشاد جديد</button>
+  </div>
+  <div class="pg-scroll"><div id="guides-grid" class="guides-grid"></div></div>
+</div>
+
+<!-- ص١٣: حسابي -->
+
+<div class="pg" id="pg-account">
+  <div class="pg-top"><h2>حسابي</h2><button class="btn-danger" onclick="doLogout()">تسجيل الخروج</button></div>
+  <div class="pg-scroll"><div id="acc-content"></div></div>
+</div>
+
+<!-- ص١٤: لوحة المزارع -->
+
+<div class="pg" id="pg-farmer-dash">
+  <div class="pg-top"><h2>لوحة تحكم المزارع 🌾</h2><button class="btn-pri" onclick="openAddProduct(null)">+ إضافة منتج</button></div>
+  <div class="pg-scroll"><div id="farmer-dash"></div></div>
+</div>
+
+<!-- ص١٥: لوحة الأدمن -->
+
+<div class="pg" id="pg-admin-dash">
+  <div class="pg-top"><h2>لوحة التحكم 🛡️</h2></div>
+  <div class="pg-scroll"><div id="admin-dash"></div></div>
+</div>
+
+<!-- ص١٦: التقارير -->
+
+<div class="pg" id="pg-reports">
+  <div class="pg-top"><h2>التقارير والإحصائيات</h2><button class="btn-out" onclick="printRep()">🖨️ طباعة</button></div>
+  <div class="pg-scroll"><div id="reports-content"></div></div>
+</div>
+
+<!-- ص١٧: الإعلانات -->
+
+<div class="pg" id="pg-ads">
+  <div class="pg-top"><h2>إدارة الإعلانات</h2><button class="btn-pri" onclick="showM('m-ad')">+ إعلان جديد</button></div>
+  <div class="pg-scroll"><div id="ads-content" class="ads-wrap"></div></div>
+</div>
+
+</main>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<div class="overlay" id="m-product" onclick="closeOverlay(this)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><h3 id="m-prod-title">إضافة منتج</h3><button onclick="closeM('m-product')">✕</button></div>
+    <div class="photo-up" id="photo-up" onclick="document.getElementById('p-photo').click()">
+      <input type="file" id="p-photo" accept="image/*" style="display:none" onchange="prevPhoto(this)">
+      <div id="photo-inner">📷 <span>اضغط لإضافة صورة (اختياري)</span></div>
+    </div>
+    <input type="hidden" id="p-eid">
+    <div class="modal-grid">
+      <div class="field"><input type="text"   id="p-name"    placeholder="اسم المنتج *"></div>
+      <div class="field"><input type="number" id="p-price"   placeholder="السعر (ريال) *"></div>
+      <div class="field"><select id="p-cat"><option>تمور</option><option>خضار</option><option>فواكه</option><option>عسل</option><option>أعشاب</option></select></div>
+      <div class="field"><input type="number" id="p-stock"   placeholder="المخزون (كغ)"></div>
+      <div class="field"><input type="text"   id="p-emoji"   placeholder="رمز 🌴" maxlength="2"></div>
+      <div class="field"><input type="text"   id="p-origin"  placeholder="الأصل/المصدر"></div>
+    </div>
+    <div class="field"><input type="text" id="p-harvest" placeholder="تاريخ الحصاد"></div>
+    <div class="field"><textarea id="p-desc" placeholder="وصف المنتج..."></textarea></div>
+    <div class="modal-ft"><button class="btn-pri" onclick="saveProduct()">حفظ</button><button class="btn-out" onclick="closeM('m-product')">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-guide" onclick="closeOverlay(this)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><h3>إضافة إرشاد زراعي</h3><button onclick="closeM('m-guide')">✕</button></div>
+    <div class="field"><input type="text" id="g-title" placeholder="العنوان *"></div>
+    <div class="field"><textarea id="g-intro" placeholder="المقدمة..."></textarea></div>
+    <div class="field"><textarea id="g-pts" placeholder="نقطة أولى&#10;نقطة ثانية&#10;نقطة ثالثة" style="min-height:90px"></textarea></div>
+    <div class="modal-ft"><button class="btn-pri" onclick="saveGuide()">نشر</button><button class="btn-out" onclick="closeM('m-guide')">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-refund" onclick="closeOverlay(this)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><h3>💰 طلب استرداد</h3><button onclick="closeM('m-refund')">✕</button></div>
+    <div id="refund-info" class="info-note" style="margin-bottom:14px"></div>
+    <div class="field">
+      <select id="ref-reason">
+        <option value="">سبب الاسترداد *</option>
+        <option>المنتج وصل تالفاً</option><option>لا يطابق الوصف</option>
+        <option>لم يصل الطلب</option><option>جودة سيئة</option><option>سبب آخر</option>
+      </select>
+    </div>
+    <div class="field"><textarea id="ref-detail" placeholder="تفاصيل إضافية..."></textarea></div>
+    <div class="modal-ft"><button class="btn-pri" onclick="submitRefund()">إرسال</button><button class="btn-out" onclick="closeM('m-refund')">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-cancel" onclick="closeOverlay(this)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><h3>إلغاء الطلب</h3><button onclick="closeM('m-cancel')">✕</button></div>
+    <p style="color:rgba(255,255,255,.5);font-size:13px;margin-bottom:14px">سيُبلَّغ العميل بسبب الإلغاء تلقائياً</p>
+    <div class="field">
+      <select id="can-reason">
+        <option value="">سبب الإلغاء *</option>
+        <option>نفاذ المخزون</option><option>المنتج غير متوفر</option>
+        <option>مشكلة في التوصيل</option><option>مشكلة في الدفع</option>
+        <option>طلب العميل الإلغاء</option><option>سبب آخر</option>
+      </select>
+    </div>
+    <div class="field"><input type="text" id="can-note" placeholder="ملاحظة للعميل (اختياري)"></div>
+    <div class="modal-ft"><button class="btn-danger" onclick="confirmCancel()">تأكيد الإلغاء</button><button class="btn-out" onclick="closeM('m-cancel')">رجوع</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-ad" onclick="closeOverlay(this)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd"><h3>إعلان جديد</h3><button onclick="closeM('m-ad')">✕</button></div>
+    <div class="field"><textarea id="ad-txt" placeholder="محتوى الإعلان *" style="min-height:80px"></textarea></div>
+    <div class="two-col">
+      <div class="field"><input type="date" id="ad-start" placeholder="تاريخ البداية"></div>
+      <div class="field"><input type="date" id="ad-end"   placeholder="تاريخ الانتهاء"></div>
+    </div>
+    <div class="modal-ft"><button class="btn-pri" onclick="saveAd()">نشر</button><button class="btn-out" onclick="closeM('m-ad')">إلغاء</button></div>
+  </div>
+</div>
+
+<div id="print-area" style="display:none"></div>
+
+<!-- Bottom Navigation للجوال -->
+
+<nav id="bottom-nav" style="display:none">
+  <a id="bn-home"     onclick="go('home');bnAct('bn-home')"><span>🏠</span><span>الرئيسية</span></a>
+  <a id="bn-products" onclick="go('products');bnAct('bn-products')"><span>📦</span><span>منتجات</span></a>
+  <a id="bn-orders"   onclick="go('orders');bnAct('bn-orders')"><span>🧾</span><span>طلبات</span></a>
+  <a id="bn-messages" onclick="go('messages');bnAct('bn-messages')"><span>💬</span><span>رسائل</span></a>
+  <a id="bn-menu"     onclick="go('account');bnAct('bn-menu')"><span>☰</span><span>القائمة</span></a>
+</nav>
+
+<script src="app.js"></script>
+
 </body>
 </html>
